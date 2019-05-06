@@ -1,0 +1,23 @@
+const goods = [
+  { title: "Shirt", price: 150 },
+  { title: "Socks", price: 50 },
+  { title: "Jacket", price: 350 },
+  { title: "Shoes", price: 250 }
+];
+
+const renderGoodsItem = (title = "", price = 0) => {
+  return `<div class="goods-item">
+    <img src="photo.png" alt="product" class="img-product">
+    <h3>${title}</h3>
+    <p>${price} руб.</p>
+    <button class="button-item">Добавить</button>
+  </div>`;
+};
+
+const renderGoodsList = (list) => {
+  const goodsList = list.map(item =>
+    renderGoodsItem(item.title, item.price));
+  document.querySelector('.goods-list').innerHTML = goodsList.join('');
+};
+
+renderGoodsList(goods);
