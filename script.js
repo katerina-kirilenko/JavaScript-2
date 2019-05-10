@@ -30,11 +30,10 @@ class GoodsList {
     ];
   }
   render() {
-    let listHtml = '';
-    this.goods.forEach( good => {
+    const listHtml = this.goods.reduce((renderString, good) => {
       const goodItem = new GoodsItem(good.title, good.price);
-      listHtml += goodItem.render();
-    });
+      return renderString += goodItem.render();
+    }, '');
     document.querySelector('.goods-list').innerHTML = listHtml;
   }
 }
@@ -42,3 +41,19 @@ class GoodsList {
 const list = new GoodsList();
 list.fetchGoods();
 list.render();
+
+class Basket {
+  constructor() {
+    this.goods = [];
+  }
+  addProduct(goodsItem) {
+    this.goods.push(goodsItem);
+  }
+  removeProduct(goodsIndex) {
+    this.goods.splice(goodsIndex);
+  }
+}
+
+class BasketItem extends GoodsItem {
+  
+}
