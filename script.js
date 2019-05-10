@@ -46,14 +46,23 @@ class Basket {
   constructor() {
     this.goods = [];
   }
-  addProduct(goodsItem) {
-    this.goods.push(goodsItem);
+  addProduct(basketItem) {
+    this.goods.push(basketItem);
   }
   removeProduct(goodsIndex) {
     this.goods.splice(goodsIndex);
   }
+  sumCost() {
+    return this.goods.reduce((acc, currentValue) => acc + currentValue.cost());
+  }
 }
 
 class BasketItem extends GoodsItem {
-  
+  constructor(title = "Без названия", price = 0, count = 0) {
+    super(title, price);
+    this.count = count;
+  }
+  cost() {
+    return this.price * this.count;
+  }
 }
