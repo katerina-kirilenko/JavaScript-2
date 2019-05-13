@@ -31,8 +31,9 @@ header {
 }
 
 .goods-list {
-	margin-bottom: 30px;
-	padding: 40px;
+	margin: 0 auto;
+	padding: 30px;
+	max-width: 1200px;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
