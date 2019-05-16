@@ -62,7 +62,7 @@ class GoodsList {
   calcPrice() {
     return this.goods.reduce((sum, curr) => {
       if (!curr.price) return sum;
-      return sum + curr.price
+      return sum + curr.price;
     }, 0)
   }
   render() {
@@ -78,17 +78,31 @@ class Cart extends GoodsList {
   add() {
 
   }
-  update(index, newCount) {
-    this.goods[index].setCount(newCount)
+  update() {
+    makeGETRequest(`${API_URL}/getBasket.json`)
+    .then(
+      response => {
+        let obj = JSON.parse(response);
+        for (let variable of obj.contents) {
+          let cartItem = new CartItem(variable.product_name, variable.price, variable.quantity);
+          this.goods.push(cartItem);
+        }
+        console.log(this.goods);
+      },
+      error => alert(`Ошибка: ${error}`)
+    );
   }
   remove(index) {
     this.goods.splice(index, 1)
   }
 }
 
+const cart = new Cart();
+cart.update();
+
 class CartItem extends GoodsItem {
   constructor(title = "Без имени", price = "", count = 1) {
-    super();
+    super(title, price);
     this.count = count
   }
   getCount() {
