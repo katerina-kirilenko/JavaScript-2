@@ -1,5 +1,39 @@
+const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses"
+
+function makeGETRequest(url) {
+
+  return new Promise( (resolve, reject) => {
+    let xhr;
+
+    if (window.XMLHttpRequest) {
+      xhr = new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+      xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }  
+    xhr.open("GET", url, true);
+
+    xhr.onload = function() {
+      if (this.status == 200) {
+        resolve(this.response);
+      } else {
+        var error = new Error(this.statusText);
+        error.code = this.status;
+        reject(error);
+      }
+    };
+
+    xhr.onerror = function() {
+      reject(new Error("Network Error"));
+    };
+
+    xhr.send();
+  });
+}
+
+// класс элемента списка товаров
 class GoodsItem {
-  constructor(title = "Без названия", price = 0) {
+  constructor(id = 0, title = "Без имени", price = "") {
+    this.id = id;
     this.title = title;
     this.price = price;
   }
@@ -9,60 +43,99 @@ class GoodsItem {
     <h3>${this.title}</h3>
     <p>${this.price} руб.</p>
     <button class="button-item">Добавить</button>
-  </div>` ;
+  </div>`;  
+  }
+  getId() {
+    return this.id;
   }
 }
 
+// класс списка товаров
 class GoodsList {
   constructor() {
-    this.goods = [];  
+    this.goods = []
   }
   fetchGoods() {
-    this.goods = [
-      { title: "Shirt", price: 150 },
-      { title: "Socks", price: 50 },
-      { title: "Jacket", price: 350 },
-      { price: 250 },
-      { title: "Shirt", price: 150 },
-      { title: "Socks", price: 50 },
-      { title: "Jacket", price: 350 },
-      { title: "Shoes" }
-    ];
+    return makeGETRequest(`${API_URL}/catalogData.json`);
+  }
+  calcPrice() {
+    return this.goods.reduce((sum, curr) => {
+      if (!curr.price) return sum;
+      return sum + curr.price;
+    }, 0)
   }
   render() {
     const listHtml = this.goods.reduce((renderString, good) => {
-      const goodItem = new GoodsItem(good.title, good.price);
-      return renderString += goodItem.render();
+      const goodItem = new GoodsItem(good.product_name, good.price)
+      return renderString += goodItem.render()
     }, '');
     document.querySelector('.goods-list').innerHTML = listHtml;
+  }
+  setGoods(newGoods) {
+    this.goods = newGoods;
+  }
+}
+
+// класс корзины (наследуется от списка товаров)
+class Cart extends GoodsList {
+  add(cartItem) {                             //добавляем новый товар в корзину
+    if (findIndex(cartItem.getId()) < 0) {    //если его там нет
+      this.goods.push(cartItem);
+    }
+  }
+  update() {                                   //получаем данные с json
+    makeGETRequest(`${API_URL}/getBasket.json`)
+    .then(
+      response => {
+        let obj = JSON.parse(response);
+        for (let variable of obj.contents) {
+          let cartItem = new CartItem(variable.id_product, variable.product_name, variable.price, variable.quantity);
+          this.goods.push(cartItem);
+        }
+        console.log(this.goods);
+      },
+      error => alert(`Ошибка: ${error}`)
+    );
+  }
+  remove(id) {                            //удаляем товар по id
+    let index = findIndex(id);
+    if (index > -1) {
+      this.goods.splice(index, 1);
+    }
+  }
+  findIndex(id) {                       // ищем индекс товара по id
+    let index = this.goods.findIndex( item => item.id == id );
+  }
+  updateCount(id, count) {              //обновляем кол-во товара по id
+    let index = findIndex(id);
+    if (index > -1) {
+      this.goods[index].setCount(count);
+    }
+  }
+}
+
+const cart = new Cart();   //создали объект
+cart.update();            // для обновления корзины
+
+// класс элемента корзины (наследуется от элемента списка товаров)
+class CartItem extends GoodsItem {
+  constructor( id = 0, title = "Без имени", price = "", count = 1) {
+    super(id, title, price);
+    this.count = count;
+  }
+  getCount() {
+    return this.count;
+  }
+  setCount(newCount) {
+    this.count = newCount;
   }
 }
 
 const list = new GoodsList();
-list.fetchGoods();
-list.render();
-
-class Basket {
-  constructor() {
-    this.goods = [];
-  }
-  addProduct(basketItem) {
-    this.goods.push(basketItem);
-  }
-  removeProduct(goodsIndex) {
-    this.goods.splice(goodsIndex);
-  }
-  sumCost() {
-    return this.goods.reduce((acc, currentValue) => acc + currentValue.cost());
-  }
-}
-
-class BasketItem extends GoodsItem {
-  constructor(title = "Без названия", price = 0, count = 0) {
-    super(title, price);
-    this.count = count;
-  }
-  cost() {
-    return this.price * this.count;
-  }
-}
+list.fetchGoods().then(
+  response => {
+    list.setGoods(JSON.parse(response));
+    list.render();
+  },
+  error => alert(`Ошибка: ${error}`)
+);
