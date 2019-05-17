@@ -30,8 +30,10 @@ function makeGETRequest(url) {
   });
 }
 
+// класс элемента списка товаров
 class GoodsItem {
-  constructor(title = "Без имени", price = "") {
+  constructor(id = 0, title = "Без имени", price = "") {
+    this.id = id;
     this.title = title;
     this.price = price;
   }
@@ -41,9 +43,14 @@ class GoodsItem {
     <h3>${this.title}</h3>
     <p>${this.price} руб.</p>
     <button class="button-item">Добавить</button>
-  </div>`;  }
+  </div>`;  
+  }
+  getId() {
+    return this.id;
+  }
 }
 
+// класс списка товаров
 class GoodsList {
   constructor() {
     this.goods = []
@@ -69,17 +76,20 @@ class GoodsList {
   }
 }
 
+// класс корзины (наследуется от списка товаров)
 class Cart extends GoodsList {
-  add() {
-
+  add(cartItem) {                             //добавляем новый товар в корзину
+    if (findIndex(cartItem.getId()) < 0) {    //если его там нет
+      this.goods.push(cartItem);
+    }
   }
-  update() {
+  update() {                                   //получаем данные с json
     makeGETRequest(`${API_URL}/getBasket.json`)
     .then(
       response => {
         let obj = JSON.parse(response);
         for (let variable of obj.contents) {
-          let cartItem = new CartItem(variable.product_name, variable.price, variable.quantity);
+          let cartItem = new CartItem(variable.id_product, variable.product_name, variable.price, variable.quantity);
           this.goods.push(cartItem);
         }
         console.log(this.goods);
@@ -87,24 +97,37 @@ class Cart extends GoodsList {
       error => alert(`Ошибка: ${error}`)
     );
   }
-  remove(index) {
-    this.goods.splice(index, 1)
+  remove(id) {                            //удаляем товар по id
+    let index = findIndex(id);
+    if (index > -1) {
+      this.goods.splice(index, 1);
+    }
+  }
+  findIndex(id) {                       // ищем индекс товара по id
+    let index = this.goods.findIndex( item => item.id == id );
+  }
+  updateCount(id, count) {              //обновляем кол-во товара по id
+    let index = findIndex(id);
+    if (index > -1) {
+      this.goods[index].setCount(count);
+    }
   }
 }
 
-const cart = new Cart();
-cart.update();
+const cart = new Cart();   //создали объект
+cart.update();            // для обновления корзины
 
+// класс элемента корзины (наследуется от элемента списка товаров)
 class CartItem extends GoodsItem {
-  constructor(title = "Без имени", price = "", count = 1) {
-    super(title, price);
-    this.count = count
+  constructor( id = 0, title = "Без имени", price = "", count = 1) {
+    super(id, title, price);
+    this.count = count;
   }
   getCount() {
     return this.count;
   }
   setCount(newCount) {
-    this.count = newCount
+    this.count = newCount;
   }
 }
 
