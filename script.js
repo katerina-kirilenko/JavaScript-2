@@ -49,15 +49,7 @@ class GoodsList {
     this.goods = []
   }
   fetchGoods() {
-    makeGETRequest(`${API_URL}/catalogData.json`)
-    .then(
-      response => {
-        this.goods = JSON.parse(response);
-        this.render();
-      },
-      error => alert(`Ошибка: ${error}`)
-    );
-
+    return makeGETRequest(`${API_URL}/catalogData.json`);
   }
   calcPrice() {
     return this.goods.reduce((sum, curr) => {
@@ -71,6 +63,9 @@ class GoodsList {
       return renderString += goodItem.render()
     }, '');
     document.querySelector('.goods-list').innerHTML = listHtml;
+  }
+  setGoods(newGoods) {
+    this.goods = newGoods;
   }
 }
 
@@ -114,4 +109,10 @@ class CartItem extends GoodsItem {
 }
 
 const list = new GoodsList();
-list.fetchGoods();
+list.fetchGoods().then(
+  response => {
+    list.setGoods(JSON.parse(response));
+    list.render();
+  },
+  error => alert(`Ошибка: ${error}`)
+);
