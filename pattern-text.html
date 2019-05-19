@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Pattern-text</title>
+</head>
+<body>
+   <p><strong>Введите текст:</strong></p>
+   <p><textarea name="input" rows="10" cols="150">
+Сайт рыбатекст 'поможет' дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить 'навык' публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей. Текст генерируется абзацами 'случайным образом от двух до десяти' предложений в абзаце, что позволяет сделать текст более привлекательным и живым для визуально-слухового восприятия.
+   </textarea></p>
+   <p><input type="button" value="Обработать" class="button"></p>
+   <p><strong>Обработанный текст:</strong></p>
+   <p><textarea name="output" rows="10" cols="150"></textarea></p>   
+
+	<script>
+		let processButton = document.querySelector('.button');
+		processButton.onclick = onclick;
+
+		function onclick(event) {
+			let textInput = document.getElementsByName('input')[0];
+			let textOutput = document.getElementsByName('output')[0];
+			const regexp = new RegExp('\'', 'g');
+			textOutput.textContent = textInput.textContent.replace(regexp, '\"');
+		}
+	</script>
+</body>
+</html>
