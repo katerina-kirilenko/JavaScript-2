@@ -3,25 +3,66 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Pattern-text</title>
+	<style>
+		html, body {
+		  margin: 0;
+		  padding: 0;
+		}
+		main {
+	      margin: 0 30px;
+    	}
+		section {
+			width: 48%;
+			margin: 0 10px;
+			position: relative;
+			float: left;
+		}
+	    textarea {
+	      width: 96%;
+	      height: 300px;
+	      padding: 10px;
+	      font-family: 'Calibri', sans-serif;
+	      font-size: 18px;
+	      color: #333;
+	    }
+	    p {
+	      font-family: 'Roboto', sans-serif;
+	      font-size: 18px;	    	
+	    }
+	</style>
 </head>
 <body>
-   <p><strong>Введите текст:</strong></p>
-   <p><textarea name="input" rows="10" cols="150">
-Сайт рыбатекст 'поможет' дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить 'навык' публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей. Текст генерируется абзацами 'случайным образом от двух до десяти' предложений в абзаце, что позволяет сделать текст более привлекательным и живым для визуально-слухового восприятия.
-   </textarea></p>
-   <p><input type="button" value="Обработать" class="button"></p>
-   <p><strong>Обработанный текст:</strong></p>
-   <p><textarea name="output" rows="10" cols="150"></textarea></p>   
+	<main>
+		<section>
+			<p><strong>Введите текст:</strong></p>
+			<p><textarea name="input">'Contrary to popular' belief, Lorem Ipsum is not simply random text. It's has roots in a piece of classical Latin literature from 45 BC, making it over '2000' years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and 'going' through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the 'Renaissance'. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a 'line in section 1.10.32'.
+			</textarea></p>
+			<p><input type="button" value="Обработать" class="button"></p>			
+		</section>
+		<section>
+			<p><strong>Обработанный текст:</strong></p>
+			<p><textarea name="output"></textarea></p> 			
+		</section>		
+	</main>  
 
 	<script>
 		let processButton = document.querySelector('.button');
 		processButton.onclick = onclick;
-
-		function onclick(event) {
-			let textInput = document.getElementsByName('input')[0];
-			let textOutput = document.getElementsByName('output')[0];
-			const regexp = new RegExp('\'', 'g');
-			textOutput.textContent = textInput.textContent.replace(regexp, '\"');
+		function onclick(event) { 
+			let textInput = document.getElementsByName('input')[0]; 
+			let textOutput = document.getElementsByName('output')[0]; 
+			const regexp = new RegExp('(^| )\'|(\'[ ,.?!])', 'g'); 
+			let symbols = " .,?!"; 
+			textOutput.textContent = textInput.textContent.replace( 
+				regexp, 
+				(match, s1, s2, s3) => { 
+					if ( match.length == 2 ) { 
+						let index = symbols.indexOf( match[1] ); 
+						return ( index > -1 ) ? ( "\"" + symbols[index] ) : ( " \"" ); 
+					}
+				return "\""; 
+				} 
+			); 
 		}
 	</script>
 </body>
