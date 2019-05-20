@@ -1,38 +1,34 @@
 const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses"
 
+function getXhr() {
+  if (window.XMLHttpRequest) {
+    return new XMLHttpRequest();
+  } else if (window.ActiveXObject) {
+    return new ActiveXObject("Microsoft.XMLHTTP");
+  }
+}
+
 function makeGETRequest(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = getXhr();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
 
-  return new Promise( (resolve, reject) => {
-    let xhr;
-
-    if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest();
-    } else if (window.ActiveXObject) {
-      xhr = new ActiveXObject("Microsoft.XMLHTTP");
-    }  
-    xhr.open("GET", url, true);
-
-    xhr.onload = function() {
-      if (this.status == 200) {
-        resolve(this.response);
+      if (xhr.status === 200) {
+        resolve(xhr.responseText)
       } else {
-        var error = new Error(this.statusText);
-        error.code = this.status;
-        reject(error);
+        reject("Request error")
       }
     };
 
-    xhr.onerror = function() {
-      reject(new Error("Network Error"));
-    };
-
+    xhr.open("GET", url);
     xhr.send();
-  });
+  })
 }
 
 // класс элемента списка товаров
 class GoodsItem {
-  constructor(id = 0, title = "Без имени", price = "") {
+  constructor(id, title = "Без имени", price = "") {
     this.id = id;
     this.title = title;
     this.price = price;
@@ -42,21 +38,41 @@ class GoodsItem {
     <img src="photo.png" alt="product" class="img-product">
     <h3>${this.title}</h3>
     <p>${this.price} руб.</p>
-    <button class="button-item">Добавить</button>
+    <button data-id="${this.id}" class="button-item">Добавить</button>
   </div>`;  
-  }
-  getId() {
-    return this.id;
   }
 }
 
 // класс списка товаров
 class GoodsList {
   constructor() {
-    this.goods = []
+    this.goods = [];
+    this.filteredGoods = [];
   }
   fetchGoods() {
-    return makeGETRequest(`${API_URL}/catalogData.json`);
+    return makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
+      this.goods = JSON.parse(goods)
+      this.filteredGoods = JSON.parse(goods)
+    }).catch((err) => console.error(err));
+  }
+  filterGoods(value) {
+    const regexp = new RegExp(value, "i")
+    this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
+    this.render();
+  }
+  addEvents(cart) {
+    const buttons = [...document.querySelectorAll('.button-item')]
+    buttons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = e.target.getAttribute("data-id");
+        const product = this.goods.find(item => item.id_product == id);
+        cart.add(product);
+      })
+    })
+  }
+  findIndex(id) {                       
+    let index = this.goods.findIndex( item => item.id_product == id );
   }
   calcPrice() {
     return this.goods.reduce((sum, curr) => {
@@ -64,62 +80,40 @@ class GoodsList {
       return sum + curr.price;
     }, 0)
   }
-  render() {
-    const listHtml = this.goods.reduce((renderString, good) => {
-      const goodItem = new GoodsItem(good.product_name, good.price)
-      return renderString += goodItem.render()
+  render(cart) {
+    const listHtml = this.filteredGoods.reduce((renderString, good) => {
+      const goodItem = new GoodsItem(good.id_product, good.product_name, good.price);
+      return renderString += goodItem.render();
     }, '');
     document.querySelector('.goods-list').innerHTML = listHtml;
-  }
-  setGoods(newGoods) {
-    this.goods = newGoods;
+    this.addEvents(cart);
   }
 }
 
 // класс корзины (наследуется от списка товаров)
 class Cart extends GoodsList {
-  add(cartItem) {                             //добавляем новый товар в корзину
-    if (findIndex(cartItem.getId()) < 0) {    //если его там нет
-      this.goods.push(cartItem);
-    }
+  add(product) {
+    makeGETRequest(`${API_URL}/addToBasket.json`).then(() => {
+      if (this.findIndex(product.id_product) < 0) {    
+        cart.goods.push(product);
+      }
+      console.log(product);
+    }).catch(err => console.error(err))
   }
-  update() {                                   //получаем данные с json
-    makeGETRequest(`${API_URL}/getBasket.json`)
-    .then(
-      response => {
-        let obj = JSON.parse(response);
-        for (let variable of obj.contents) {
-          let cartItem = new CartItem(variable.id_product, variable.product_name, variable.price, variable.quantity);
-          this.goods.push(cartItem);
-        }
-        console.log(this.goods);
-      },
-      error => alert(`Ошибка: ${error}`)
-    );
+  update(index, newCount) {
+    this.goods[index].setCount(newCount)
   }
-  remove(id) {                            //удаляем товар по id
-    let index = findIndex(id);
-    if (index > -1) {
+  remove(id) {
+    makeGETRequest(`${API_URL}/deleteFromBasket.json`).then(() => {
+      const index = this.findIndex(id);
       this.goods.splice(index, 1);
-    }
-  }
-  findIndex(id) {                       // ищем индекс товара по id
-    let index = this.goods.findIndex( item => item.id == id );
-  }
-  updateCount(id, count) {              //обновляем кол-во товара по id
-    let index = findIndex(id);
-    if (index > -1) {
-      this.goods[index].setCount(count);
-    }
-  }
+    }).catch(err => console.error(err));
+  } 
 }
-
-const cart = new Cart();   //создали объект
-cart.update();            // для обновления корзины
 
 // класс элемента корзины (наследуется от элемента списка товаров)
 class CartItem extends GoodsItem {
-  constructor( id = 0, title = "Без имени", price = "", count = 1) {
+  constructor( id, title = "Без имени", price = "", count = 1 ) {
     super(id, title, price);
     this.count = count;
   }
@@ -132,10 +126,16 @@ class CartItem extends GoodsItem {
 }
 
 const list = new GoodsList();
-list.fetchGoods().then(
-  response => {
-    list.setGoods(JSON.parse(response));
-    list.render();
-  },
-  error => alert(`Ошибка: ${error}`)
-);
+const cart = new Cart();
+list.fetchGoods().then(() => {
+  list.render(cart);
+}).catch((err) => console.error(err));
+
+const searchForm = document.querySelector('.search-form');
+const searchInput = document.querySelector('.goods-search');
+searchForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const value = searchInput.value;
+  list.filterGoods(value);
+})
+

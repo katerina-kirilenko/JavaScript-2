@@ -10,12 +10,19 @@
 </head>
 <body>
   <header>
-    <button class="cart-button">Корзина</button>
+    <div class="container">
+      <form class="search-form">
+        <input class="goods-search" type="text">
+        <button type="submit" class="search-button">Искать</button>
+      </form>
+      <button class="cart-button">Корзина</button>
+    </div>
   </header>
   <main>
-    <div class="goods-list"></div>
+    <div class="container">
+      <div class="goods-list"></div>
+    </div>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
