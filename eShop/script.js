@@ -8,7 +8,41 @@ function getXhr() {
   }
 }
 
-function makeGETRequest(url) {
+new Vue({
+  el: '#app',
+  data: {
+    goods: [],
+    filteredGoods: [],
+    searchLine: ""
+  },
+  methods: {
+    makeGETRequest(url) {
+      return new Promise((resolve, reject) => {
+        const xhr = getXhr();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState !== 4) return;
+
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText))
+          } else {
+            reject("Request error")
+          }
+        };
+
+        xhr.open("GET", url);
+        xhr.send();
+      })
+    }
+  },
+  mounted() {
+    this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
+      this.goods = goods;
+      this.filteredGoods = goods;
+    })
+  }
+});
+
+/*function makeGETRequest(url) {
   return new Promise((resolve, reject) => {
     const xhr = getXhr();
     xhr.onreadystatechange = function () {
@@ -137,5 +171,5 @@ searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const value = searchInput.value;
   list.filterGoods(value);
-})
+});*/
 

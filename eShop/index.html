@@ -9,20 +9,29 @@
   <title>eShop</title>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <form class="search-form">
-        <input class="goods-search" type="text">
-        <button type="submit" class="search-button">Искать</button>
-      </form>
-      <button class="cart-button">Корзина</button>
-    </div>
-  </header>
-  <main>
-    <div class="container">
-      <div class="goods-list"></div>
-    </div>
-  </main>
+  <div id="app">
+    <header>
+      <div class="container">
+        <form class="search-form">
+          <input class="goods-search" type="text">
+          <button type="submit" class="search-button">Искать</button>
+        </form>
+        <button class="cart-button">Корзина</button>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <div class="goods-list">
+          <div class="goods-item" v-for="good in filteredGoods">
+            <img src="photo.png" alt="product" class="img-product">
+            <h3>{{ good.product_name }}</h3>
+            <p>{{ good.price }} руб.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
