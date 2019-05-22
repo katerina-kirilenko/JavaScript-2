@@ -63,7 +63,11 @@ new Vue({
   mounted() {
     this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
       this.goods = goods;
-      this.filteredGoods = goods;
+      if (goods.length > 0) {
+        this.filteredGoods = goods;
+      } else {
+        this.filteredGoods = [{product_name:"Нет данных"}];
+      }
     })
   }
 });
