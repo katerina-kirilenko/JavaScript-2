@@ -13,8 +13,8 @@
     <header>
       <div class="container">
         <form class="search-form">
-          <input class="goods-search" type="text">
-          <button type="submit" class="search-button">Искать</button>
+          <input class="goods-search" type="text" v-model="searchLine">
+          <button type="submit" class="search-button" v-on:click="searchProduct">Искать</button>
         </form>
         <button class="cart-button"><a href="#blackout">Корзина</a></button>
       </div>

@@ -11,8 +11,9 @@ function getXhr() {
 new Vue({
   el: '#app',
   data: {
-    goods: [],
-    filteredGoods: [],
+    goods: [], // все товары
+
+    filteredGoods: [], // найденные товары
     searchLine: ""
   },
   methods: {
@@ -31,7 +32,24 @@ new Vue({
 
         xhr.open("GET", url);
         xhr.send();
-      })
+      });
+    },
+    searchProduct() {
+      if (this.searchLine.length>0) {
+        let searchText = this.searchLine.toLowerCase();
+        this.filteredGoods = [];
+        this.goods.forEach(
+            (product) => {
+              let productName = product.product_name.toLowerCase();
+
+              if (productName.indexOf(searchText) > -1) {
+                this.filteredGoods.push(product);
+              }
+            }
+        );
+      } else {
+        this.filteredGoods = this.goods;
+      }
     }
   },
   mounted() {
@@ -42,7 +60,8 @@ new Vue({
   }
 });
 
-/*function makeGETRequest(url) {
+/*
+function makeGETRequest(url) {
   return new Promise((resolve, reject) => {
     const xhr = getXhr();
     xhr.onreadystatechange = function () {
@@ -83,44 +102,29 @@ class GoodsList {
     this.goods = [];
     this.filteredGoods = [];
   }
-  fetchGoods() {
-    return makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
-      this.goods = JSON.parse(goods)
-      this.filteredGoods = JSON.parse(goods)
-    }).catch((err) => console.error(err));
-  }
   filterGoods(value) {
-    const regexp = new RegExp(value, "i")
+    const regexp = new RegExp(value, "i");
     this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
-    this.render();
   }
   addEvents(cart) {
-    const buttons = [...document.querySelectorAll('.button-item')]
+    const buttons = [...document.querySelectorAll('.button-item')];
     buttons.forEach((button) => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
         const id = e.target.getAttribute("data-id");
-        const product = this.goods.find(item => item.id_product == id);
+        const product = this.goods.find(item => item.id_product === id);
         cart.add(product);
       })
     })
   }
   findIndex(id) {                       
-    let index = this.goods.findIndex( item => item.id_product == id );
+    let index = this.goods.findIndex( item => item.id_product === id );
   }
   calcPrice() {
     return this.goods.reduce((sum, curr) => {
       if (!curr.price) return sum;
       return sum + curr.price;
     }, 0)
-  }
-  render(cart) {
-    const listHtml = this.filteredGoods.reduce((renderString, good) => {
-      const goodItem = new GoodsItem(good.id_product, good.product_name, good.price);
-      return renderString += goodItem.render();
-    }, '');
-    document.querySelector('.goods-list').innerHTML = listHtml;
-    this.addEvents(cart);
   }
 }
 
