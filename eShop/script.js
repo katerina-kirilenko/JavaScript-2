@@ -12,9 +12,9 @@ new Vue({
   el: '#app',
   data: {
     goods: [], // все товары
-
     filteredGoods: [], // найденные товары
-    searchLine: ""
+    searchLine: "",
+    isVisibleCart: false
   },
   methods: {
     makeGETRequest(url) {
@@ -50,6 +50,14 @@ new Vue({
       } else {
         this.filteredGoods = this.goods;
       }
+    },
+    showCart() {
+      this.isVisibleCart = true;
+      document.getElementById('blackout').style.display = "block";
+    },
+    hideCart() {
+      this.isVisibleCart = false;
+      document.getElementById('blackout').style.display = "none";
     }
   },
   mounted() {

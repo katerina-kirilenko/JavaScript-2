@@ -16,7 +16,7 @@
           <input class="goods-search" type="text" v-model="searchLine">
           <button type="submit" class="search-button" v-on:click="searchProduct">Искать</button>
         </form>
-        <button class="cart-button"><a href="#blackout">Корзина</a></button>
+        <button class="cart-button" v-on:click="showCart">Корзина</button>
       </div>
     </header>
     <main>
@@ -40,7 +40,7 @@
               <p>{{ good.price }} руб.</p>
             </div>
           </div>
-          <a href="#" class="close">✖</a>
+          <p class="close" v-on:click="hideCart">✖</p>
         </div>
       </div>
 

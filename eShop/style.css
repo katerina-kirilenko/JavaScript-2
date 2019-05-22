@@ -40,8 +40,6 @@ button {
 	padding: 5px 0;
 	background: #049;
 	border-radius: 26px;
-}
-.cart-button a {
 	color: #fff;
 	font-size: 0.875em;
 	text-decoration: none;
@@ -145,13 +143,14 @@ button {
 	margin: auto;
 	background: #fff;
 }
-#blackout:target {display: block;}
+
 .close {
 	position: absolute;
 	width: 20px;
 	height: 20px;
 	color: #333333;
 	padding: 10px;
+	margin: 0;
 	top: 0;
 	right: 0;
 	text-decoration: none;
