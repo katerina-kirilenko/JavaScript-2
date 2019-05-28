@@ -27,6 +27,7 @@
             <h3>{{ good.product_name }}</h3>
             <p>{{ good.price }} руб.</p>
           </div>
+          <p class="no-data" v-if="noData">Нет данных</p>
         </div>
       </div>
 

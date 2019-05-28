@@ -156,3 +156,10 @@ button {
 	cursor:pointer;
 }
 .close:hover {color: #8e0a00;}
+
+.no-data {
+	display: block;
+	width: 100%;
+	text-align: center;
+	font-size: 20px;
+}

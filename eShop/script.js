@@ -16,6 +16,11 @@ new Vue({
     searchLine: "",
     isVisibleCart: false,
   },
+  computed: {
+      noData() {
+          return this.filteredGoods.length === 0;
+      }
+  },
   methods: {
     makeGETRequest(url) {
       return new Promise((resolve, reject) => {
@@ -48,11 +53,7 @@ new Vue({
   mounted() {
     this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
       this.goods = goods;
-      if (goods.length > 0) {
-        this.filteredGoods = goods;
-      } else {
-        this.filteredGoods = [{product_name:"Нет данных"}];
-      }
+      this.filteredGoods = goods;
     })
   }
 });
