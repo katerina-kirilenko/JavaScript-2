@@ -9,20 +9,44 @@
   <title>eShop</title>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <form class="search-form">
-        <input class="goods-search" type="text">
-        <button type="submit" class="search-button">Искать</button>
-      </form>
-      <button class="cart-button">Корзина</button>
-    </div>
-  </header>
-  <main>
-    <div class="container">
-      <div class="goods-list"></div>
-    </div>
-  </main>
+  <div id="app">
+    <header>
+      <div class="container">
+        <form class="search-form" @submit.prevent="filterGoods">
+          <input class="goods-search" type="text" v-model.trim="searchLine">
+          <button type="submit" class="search-button">Искать</button>
+        </form>
+        <button class="cart-button" @click="showCart">Корзина</button>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <div class="goods-list">
+          <div class="goods-item" v-for="good in filteredGoods">
+            <img src="photo.png" alt="product" class="img-product">
+            <h3>{{ good.product_name }}</h3>
+            <p>{{ good.price }} руб.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="blackout" v-if="isVisibleCart">
+        <div id="cart">
+          <p>Товары в вашей корзине:</p>
+          <div class="goods-list">
+            <div class="goods-item" v-for="good in goods">
+              <img src="photo.png" alt="product" class="img-product">
+              <h3>{{ good.product_name }}</h3>
+              <p>{{ good.price }} руб.</p>
+            </div>
+          </div>
+          <p class="close" @click="hideCart">✖</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
