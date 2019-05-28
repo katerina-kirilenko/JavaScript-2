@@ -7,6 +7,29 @@ function getXhr() {
     return new ActiveXObject("Microsoft.XMLHTTP");
   }
 }
+Vue.component("goods-item", {
+    props: ["good"],
+    template: `<div class="goods-item">
+        <img src="photo.png" alt="product" class="img-product">
+        <h3>{{ good.product_name }}</h3>
+        <p>{{ good.price }} руб.</p>
+    </div>`,
+});
+Vue.component("goods-list", {
+    props: ["goods"],
+    template: `<div class="goods-list">
+        <goods-item v-for="good in goods" :good="good" :key="good.id_product"></goods-item>
+    </div>`,
+});
+
+/*<div class="goods-list">
+    <div class="goods-item" v-for="good in filteredGoods">
+    <img src="photo.png" alt="product" class="img-product">
+    <h3>{{ good.product_name }}</h3>
+<p>{{ good.price }} руб.</p>
+    </div>
+<p class="no-data" v-if="noData">Нет данных</p>
+</div>*/
 
 new Vue({
   el: '#app',
