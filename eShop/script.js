@@ -14,7 +14,7 @@ new Vue({
     goods: [], // все товары
     filteredGoods: [], // найденные товары
     searchLine: "",
-    isVisibleCart: false
+    isVisibleCart: false,
   },
   methods: {
     makeGETRequest(url) {
@@ -32,32 +32,17 @@ new Vue({
 
         xhr.open("GET", url);
         xhr.send();
-      });
+      })
     },
-    searchProduct() {
-      if (this.searchLine.length>0) {
-        let searchText = this.searchLine.toLowerCase();
-        this.filteredGoods = [];
-        this.goods.forEach(
-            (product) => {
-              let productName = product.product_name.toLowerCase();
-
-              if (productName.indexOf(searchText) > -1) {
-                this.filteredGoods.push(product);
-              }
-            }
-        );
-      } else {
-        this.filteredGoods = this.goods;
-      }
+    filterGoods() {
+      const regexp = new RegExp(this.searchLine, "i");
+      this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
     },
     showCart() {
       this.isVisibleCart = true;
-      document.getElementById('blackout').style.display = "block";
     },
     hideCart() {
       this.isVisibleCart = false;
-      document.getElementById('blackout').style.display = "none";
     }
   },
   mounted() {
@@ -73,24 +58,6 @@ new Vue({
 });
 
 /*
-function makeGETRequest(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = getXhr();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) return;
-
-      if (xhr.status === 200) {
-        resolve(xhr.responseText)
-      } else {
-        reject("Request error")
-      }
-    };
-
-    xhr.open("GET", url);
-    xhr.send();
-  })
-}
-
 // класс элемента списка товаров
 class GoodsItem {
   constructor(id, title = "Без имени", price = "") {
@@ -113,10 +80,6 @@ class GoodsList {
   constructor() {
     this.goods = [];
     this.filteredGoods = [];
-  }
-  filterGoods(value) {
-    const regexp = new RegExp(value, "i");
-    this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
   }
   addEvents(cart) {
     const buttons = [...document.querySelectorAll('.button-item')];

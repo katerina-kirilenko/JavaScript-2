@@ -12,11 +12,11 @@
   <div id="app">
     <header>
       <div class="container">
-        <form class="search-form">
-          <input class="goods-search" type="text" v-model="searchLine">
-          <button type="submit" class="search-button" v-on:click="searchProduct">Искать</button>
+        <form class="search-form" @submit.prevent="filterGoods">
+          <input class="goods-search" type="text" v-model.trim="searchLine">
+          <button type="submit" class="search-button">Искать</button>
         </form>
-        <button class="cart-button" v-on:click="showCart">Корзина</button>
+        <button class="cart-button" @click="showCart">Корзина</button>
       </div>
     </header>
     <main>
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div id="blackout">
+      <div id="blackout" v-if="isVisibleCart">
         <div id="cart">
           <p>Товары в вашей корзине:</p>
           <div class="goods-list">
@@ -40,7 +40,7 @@
               <p>{{ good.price }} руб.</p>
             </div>
           </div>
-          <p class="close" v-on:click="hideCart">✖</p>
+          <p class="close" @click="hideCart">✖</p>
         </div>
       </div>
 
