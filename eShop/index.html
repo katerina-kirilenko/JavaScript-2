@@ -12,10 +12,7 @@
   <div id="app">
     <header>
       <div class="container">
-        <form class="search-form" @submit.prevent="filterGoods">
-          <input class="goods-search" type="text" v-model.trim="searchLine">
-          <button type="submit" class="search-button">Искать</button>
-        </form>
+        <search-form @submit.prevent="filterGoods"></search-form>
         <button class="cart-button" @click="showCart">Корзина</button>
       </div>
     </header>

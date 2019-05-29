@@ -7,6 +7,33 @@ function getXhr() {
     return new ActiveXObject("Microsoft.XMLHTTP");
   }
 }
+
+Vue.component('custom-input', {
+    props: ['value'],
+    template: `<input
+      v-bind:value="value"
+      v-on:input="$emit('input', $event.target.value)"
+    >`,
+    methods: {
+        filterGoods() {
+            const regexp = new RegExp(this.searchLine, "i");
+            this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name));
+        }
+    }
+});
+Vue.component ("search-form", {
+    props: ["searchLine"],
+    template: `<form class="search-form">
+        <custom-input class="goods-search" type="text" v-model.trim="searchLine"></custom-input>
+        <button type="submit" class="search-button">Искать</button>
+    </form>`
+});
+
+/*<form class="search-form" @submit.prevent="filterGoods">
+<input class="goods-search" type="text" v-model.trim="searchLine">
+<button type="submit" class="search-button">Искать</button>
+</form>*/
+
 Vue.component("goods-item", {
     props: ["good"],
     template: `<div class="goods-item">
@@ -22,21 +49,11 @@ Vue.component("goods-list", {
     </div>`,
 });
 
-/*<div class="goods-list">
-    <div class="goods-item" v-for="good in filteredGoods">
-    <img src="photo.png" alt="product" class="img-product">
-    <h3>{{ good.product_name }}</h3>
-<p>{{ good.price }} руб.</p>
-    </div>
-<p class="no-data" v-if="noData">Нет данных</p>
-</div>*/
-
 new Vue({
   el: '#app',
   data: {
     goods: [], // все товары
     filteredGoods: [], // найденные товары
-    searchLine: "",
     isVisibleCart: false,
   },
   computed: {
@@ -62,16 +79,12 @@ new Vue({
         xhr.send();
       })
     },
-    filterGoods() {
-      const regexp = new RegExp(this.searchLine, "i");
-      this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
-    },
     showCart() {
       this.isVisibleCart = true;
     },
     hideCart() {
       this.isVisibleCart = false;
-    }
+    },
   },
   mounted() {
     this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
