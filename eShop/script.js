@@ -54,12 +54,29 @@ Vue.component("cart", {
       </div>`,
 });
 
+Vue.component('error-message', {
+    props: ["message"],
+    methods: {
+        setCloseTimeout() {
+            setTimeout(() => {
+                this.$emit('close')
+            }, 3000)
+        }
+    },
+    mounted() {
+      this.setCloseTimeout();
+    },
+    template: `<div class="error-message">{{ message }}</div>`
+});
+
 new Vue({
   el: '#app',
   data: {
     goods: [], // все товары
     filteredGoods: [], // найденные товары
     isVisibleCart: false,
+    isVisibleError: false,
+    message: ""
   },
   computed: {
       noData() {
@@ -94,11 +111,20 @@ new Vue({
     hideCart() {
       this.isVisibleCart = false;
     },
+    showError() {
+      this.isVisibleError = true;
+    },
+    hideError() {
+      this.isVisibleError = false;
+    },
   },
   mounted() {
     this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
       this.goods = goods;
       this.filteredGoods = goods;
+    }).catch((err) => {
+      this.message = err;
+      this.showError();
     })
   }
 });

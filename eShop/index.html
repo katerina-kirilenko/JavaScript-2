@@ -10,6 +10,7 @@
 </head>
 <body>
   <div id="app">
+    <error-message :message="message" @close="hideError" v-if="isVisibleError"></error-message>
     <header>
       <div class="container">
         <search-form @submit="filterGoods"></search-form>
