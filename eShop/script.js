@@ -8,31 +8,20 @@ function getXhr() {
   }
 }
 
-Vue.component('custom-input', {
-    props: ['value'],
-    template: `<input
-      v-bind:value="value"
-      v-on:input="$emit('input', $event.target.value)"
-    >`,
-    methods: {
-        filterGoods() {
-            const regexp = new RegExp(this.searchLine, "i");
-            this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name));
-        }
-    }
-});
 Vue.component ("search-form", {
-    props: ["searchLine"],
-    template: `<form class="search-form">
-        <custom-input class="goods-search" type="text" v-model.trim="searchLine"></custom-input>
+    data: () => ({
+        searchLine: ""
+    }),
+    methods: {
+        onSubmit () {
+            this.$emit("submit", this.searchLine)
+        }
+    },
+    template: `<form class="search-form" @submit.prevent="onSubmit">
+        <input class="goods-search" type="text" v-model.trim="searchLine">
         <button type="submit" class="search-button">Искать</button>
     </form>`
 });
-
-/*<form class="search-form" @submit.prevent="filterGoods">
-<input class="goods-search" type="text" v-model.trim="searchLine">
-<button type="submit" class="search-button">Искать</button>
-</form>*/
 
 Vue.component("goods-item", {
     props: ["good"],
@@ -78,6 +67,10 @@ new Vue({
         xhr.open("GET", url);
         xhr.send();
       })
+    },
+    filterGoods(searchLine) {
+      const regexp = new RegExp(searchLine, "i");
+      this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name));
     },
     showCart() {
       this.isVisibleCart = true;

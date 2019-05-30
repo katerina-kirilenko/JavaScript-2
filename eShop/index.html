@@ -12,13 +12,14 @@
   <div id="app">
     <header>
       <div class="container">
-        <search-form @submit.prevent="filterGoods"></search-form>
+        <search-form @submit="filterGoods"></search-form>
         <button class="cart-button" @click="showCart">Корзина</button>
       </div>
     </header>
     <main>
       <div class="container">
         <goods-list :goods="filteredGoods"></goods-list>
+        <p class="no-data" v-if="noData">Нет данных</p>
       </div>
       <div id="blackout" v-if="isVisibleCart">
         <div id="cart">
