@@ -31,11 +31,27 @@ Vue.component("goods-item", {
         <p>{{ good.price }} руб.</p>
     </div>`,
 });
+
 Vue.component("goods-list", {
     props: ["goods"],
     template: `<div class="goods-list">
         <goods-item v-for="good in goods" :good="good" :key="good.id_product"></goods-item>
     </div>`,
+});
+
+Vue.component("cart", {
+    methods: {
+        onClose() {
+            this.$emit('close')
+        }
+    },
+    template: `
+      <div id="blackout" >
+        <div id="cart">
+          <p>Товары в вашей корзине:</p>
+          <p class="close" @click="onClose">✖</p>
+        </div>
+      </div>`,
 });
 
 new Vue({

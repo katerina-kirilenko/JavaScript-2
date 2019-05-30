@@ -21,19 +21,7 @@
         <goods-list :goods="filteredGoods"></goods-list>
         <p class="no-data" v-if="noData">Нет данных</p>
       </div>
-      <div id="blackout" v-if="isVisibleCart">
-        <div id="cart">
-          <p>Товары в вашей корзине:</p>
-          <div class="goods-list">
-            <div class="goods-item" v-for="good in goods">
-              <img src="photo.png" alt="product" class="img-product">
-              <h3>{{ good.product_name }}</h3>
-              <p>{{ good.price }} руб.</p>
-            </div>
-          </div>
-          <p class="close" @click="hideCart">✖</p>
-        </div>
-      </div>
+      <cart v-if="isVisibleCart" @close="hideCart"></cart>
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
