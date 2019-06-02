@@ -8,13 +8,80 @@ function getXhr() {
   }
 }
 
+Vue.component ("search-form", {
+    data: () => ({
+        searchLine: ""
+    }),
+    methods: {
+        onSubmit () {
+            this.$emit("submit", this.searchLine)
+        }
+    },
+    template: `<form class="search-form" @submit.prevent="onSubmit">
+        <input class="goods-search" type="text" v-model.trim="searchLine">
+        <button type="submit" class="search-button">Искать</button>
+    </form>`
+});
+
+Vue.component("goods-item", {
+    props: ["good"],
+    template: `<div class="goods-item">
+        <img src="photo.png" alt="product" class="img-product">
+        <h3>{{ good.product_name }}</h3>
+        <p>{{ good.price }} руб.</p>
+    </div>`,
+});
+
+Vue.component("goods-list", {
+    props: ["goods"],
+    template: `<div class="goods-list">
+        <goods-item v-for="good in goods" :good="good" :key="good.id_product"></goods-item>
+    </div>`,
+});
+
+Vue.component("cart", {
+    methods: {
+        onClose() {
+            this.$emit('close')
+        }
+    },
+    template: `
+      <div id="blackout" >
+        <div id="cart">
+          <p>Товары в вашей корзине:</p>
+          <p class="close" @click="onClose">✖</p>
+        </div>
+      </div>`,
+});
+
+Vue.component('error-message', {
+    props: ["message"],
+    methods: {
+        setCloseTimeout() {
+            setTimeout(() => {
+                this.$emit('close')
+            }, 3000)
+        }
+    },
+    mounted() {
+      this.setCloseTimeout();
+    },
+    template: `<div class="error-message">{{ message }}</div>`
+});
+
 new Vue({
   el: '#app',
   data: {
     goods: [], // все товары
     filteredGoods: [], // найденные товары
-    searchLine: "",
     isVisibleCart: false,
+    isVisibleError: false,
+    message: ""
+  },
+  computed: {
+      noData() {
+          return this.filteredGoods.length === 0;
+      }
   },
   methods: {
     makeGETRequest(url) {
@@ -34,25 +101,30 @@ new Vue({
         xhr.send();
       })
     },
-    filterGoods() {
-      const regexp = new RegExp(this.searchLine, "i");
-      this.filteredGoods = this.goods.filter(good =>  regexp.test(good.product_name));
+    filterGoods(searchLine) {
+      const regexp = new RegExp(searchLine, "i");
+      this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name));
     },
     showCart() {
       this.isVisibleCart = true;
     },
     hideCart() {
       this.isVisibleCart = false;
-    }
+    },
+    showError() {
+      this.isVisibleError = true;
+    },
+    hideError() {
+      this.isVisibleError = false;
+    },
   },
   mounted() {
     this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
       this.goods = goods;
-      if (goods.length > 0) {
-        this.filteredGoods = goods;
-      } else {
-        this.filteredGoods = [{product_name:"Нет данных"}];
-      }
+      this.filteredGoods = goods;
+    }).catch((err) => {
+      this.message = err;
+      this.showError();
     })
   }
 });

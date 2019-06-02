@@ -10,40 +10,19 @@
 </head>
 <body>
   <div id="app">
+    <error-message :message="message" @close="hideError" v-if="isVisibleError"></error-message>
     <header>
       <div class="container">
-        <form class="search-form" @submit.prevent="filterGoods">
-          <input class="goods-search" type="text" v-model.trim="searchLine">
-          <button type="submit" class="search-button">Искать</button>
-        </form>
+        <search-form @submit="filterGoods"></search-form>
         <button class="cart-button" @click="showCart">Корзина</button>
       </div>
     </header>
     <main>
       <div class="container">
-        <div class="goods-list">
-          <div class="goods-item" v-for="good in filteredGoods">
-            <img src="photo.png" alt="product" class="img-product">
-            <h3>{{ good.product_name }}</h3>
-            <p>{{ good.price }} руб.</p>
-          </div>
-        </div>
+        <goods-list :goods="filteredGoods"></goods-list>
+        <p class="no-data" v-if="noData">Нет данных</p>
       </div>
-
-      <div id="blackout" v-if="isVisibleCart">
-        <div id="cart">
-          <p>Товары в вашей корзине:</p>
-          <div class="goods-list">
-            <div class="goods-item" v-for="good in goods">
-              <img src="photo.png" alt="product" class="img-product">
-              <h3>{{ good.product_name }}</h3>
-              <p>{{ good.price }} руб.</p>
-            </div>
-          </div>
-          <p class="close" @click="hideCart">✖</p>
-        </div>
-      </div>
-
+      <cart v-if="isVisibleCart" @close="hideCart"></cart>
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
