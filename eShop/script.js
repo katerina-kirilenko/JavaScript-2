@@ -23,17 +23,28 @@ Vue.component ("search-form", {
 
 Vue.component("goods-item", {
     props: ["good"],
+    methods: {
+      addToCart() {
+        this.$emit('add', this.good);
+      }
+    },
     template: `<div class="goods-item">
         <img src="photo.png" alt="product" class="img-product">
         <h3>{{ good.product_name }}</h3>
         <p>{{ good.price }} руб.</p>
+        <button class="button-item" @click="addToCart">Добавить</button>
     </div>`,
 });
 
 Vue.component("goods-list", {
     props: ["goods"],
+    methods: {
+     addToCart(goods) {
+       this.$emit('add', goods);
+     }
+  },
     template: `<div class="goods-list">
-        <goods-item v-for="good in goods" :good="good" :key="good.id_product"></goods-item>
+        <goods-item v-for="good in goods" :good="good" :key="good.id_product" @add="addToCart"></goods-item>
     </div>`,
 });
 
@@ -82,6 +93,9 @@ new Vue({
       }
   },
   methods: {
+    addToCart(good) {
+      this.makePOSTRequest("/addToCart", good);
+    },
     makeGETRequest(url) {
       return new Promise((resolve, reject) => {
         const xhr = getXhr();
@@ -114,7 +128,7 @@ new Vue({
 
         xhr.open("POST", url);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        xhr.send(data);
+        xhr.send(JSON.stringify(data));
       })
     },
     filterGoods(searchLine) {

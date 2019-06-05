@@ -34,6 +34,26 @@ app.post('/addToCart', (req, res) => {
   });
 });
 
+app.delete('/removeFromCart', (req, res) => {
+  fs.readFile('./cart.json', 'utf-8', (err, data) => {
+    if (err) {
+      res.send('{"result": 0}');
+      return;
+    }
+    const cart = JSON.parse(data);
+    const item = req.body;
+    const newCart = cart.filter(cartItem => cartItem.product_name != item.product_name);
+
+    fs.writeFile('./cart.json', JSON.stringify(newCart), (err) => {
+      if (err) {
+        res.send('{"result": 0}');
+      } else {
+        res.send('{"result": 1}');
+      }
+    })
+  });
+});
+
 app.listen(3000, function() {
   console.log('Server is running on port 3000');
 });
