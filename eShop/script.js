@@ -1,5 +1,3 @@
-const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses"
-
 function getXhr() {
   if (window.XMLHttpRequest) {
     return new XMLHttpRequest();
@@ -101,6 +99,24 @@ new Vue({
         xhr.send();
       })
     },
+    makePOSTRequest(url, data) {
+      return new Promise((resolve, reject) => {
+        const xhr = getXhr();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState !== 4) return;
+
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText))
+          } else {
+            reject("Request error")
+          }
+        };
+
+        xhr.open("POST", url);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        xhr.send(data);
+      })
+    },
     filterGoods(searchLine) {
       const regexp = new RegExp(searchLine, "i");
       this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name));
@@ -119,7 +135,7 @@ new Vue({
     },
   },
   mounted() {
-    this.makeGETRequest(`${API_URL}/catalogData.json`).then((goods) => {
+    this.makeGETRequest(`/catalogData`).then((goods) => {
       this.goods = goods;
       this.filteredGoods = goods;
     }).catch((err) => {
