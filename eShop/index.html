@@ -19,7 +19,7 @@
     </header>
     <main>
       <div class="container">
-        <goods-list :goods="filteredGoods"></goods-list>
+        <goods-list :goods="filteredGoods" @add="addToCart"></goods-list>
         <p class="no-data" v-if="noData">Нет данных</p>
       </div>
       <cart v-if="isVisibleCart" @close="hideCart"></cart>
