@@ -4,6 +4,30 @@ const fs = require('fs');
 
 const app = express();
 
+const addToStats = (type, productName) => {
+  fs.readFile('./stats.json', 'utf-8', (err, data) => {
+    if (err) {
+      res.send('{"result": 0}');
+      return;
+    }
+    const stats = JSON.parse(data);
+
+    stats.push({
+      type,
+      product_name: productName,
+      date: new Date(),
+    });
+
+    fs.writeFile('./stats.json', JSON.stringify(stats), (err) => {
+      if (err) {
+        return false;
+      } else {
+        return true;
+      }
+    })
+  });
+}
+
 app.use(express.static('.'));
 app.use(bodyParser.json());
 
@@ -29,6 +53,7 @@ app.post('/addToCart', (req, res) => {
         res.send('{"result": 0}');
       } else {
         res.send('{"result": 1}');
+        addToStats('add', item.product_name);
       }
     })
   });
@@ -49,6 +74,7 @@ app.delete('/removeFromCart', (req, res) => {
         res.send('{"result": 0}');
       } else {
         res.send('{"result": 1}');
+        addToStats('delete', item.product_name);
       }
     })
   });
